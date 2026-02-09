@@ -1,5 +1,5 @@
 import { IProduct, IOrderRequest, IOrderResponse } from "../../types";
-import { Api } from "./Api";
+import { Api } from "../base/Api";
 
 export class ApiService extends Api {
   constructor(baseUrl: string, options: RequestInit = {}) {
@@ -8,7 +8,7 @@ export class ApiService extends Api {
 
   async fetchProducts(): Promise<IProduct[]>{
     const response = await this.get<{ items: IProduct[] }>(`/product`);
-    return response.items || [];
+    return response.items;
   }
 
   async sendOrder(e: IOrderRequest): Promise<IOrderResponse> {

@@ -3,6 +3,8 @@ import { IProduct } from "../../types";
 export class Cart {
   private items: IProduct[] = [];
 
+  constructor() {}
+
   getProducts(): IProduct[] {
     return this.items;
   }
@@ -19,24 +21,21 @@ export class Cart {
     this.items = [];
   }
 
-  getTotalPrice(): number | null {
+  getTotalPrice(): number | 0 {
     let total = 0;
     this.items.forEach(item => {
       if (item.price !== null) {
         total += item.price;
       }
     })
-    if (total == 0) return null
-    else return total;
+    return total;
   }
 
   getTotalCount(): number {
     return this.items.length
   }
 
-  findProduct(id: string): string {
-    if (this.items.find((item) => item.id === id)) {
-      return `В корзине найден товар с id: ${id}`;
-    } else return `В корзине не найден товар с id: ${id}`
+  findProduct(item: IProduct): boolean {
+    return this.items.some(product => product.id === item.id)
   }
 }

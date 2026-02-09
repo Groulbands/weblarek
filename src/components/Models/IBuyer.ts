@@ -5,23 +5,25 @@ export class Buyer{
   private address: string = '';
   private email: string = '';
   private phone: string = '';
+
+  constructor() {}
   
-  setBuyerInfo({payment, address, email, phone}: IBuyer) : void {
-      if ((this.payment !== payment) && (payment !== '')) {
-        this.payment = payment;
+  setBuyerInfo(data: Partial<IBuyer>) : void {
+      if (data.payment !== undefined) {
+        this.payment = data.payment;
       }
-      if ((this.address !== address) && (address !== '')) {
-        this.address = address;
+      if (data.address !== undefined) {
+        this.address = data.address;
       }
-      if ((this.email !== email) && (email !== '')) {
-        this.email = email;
+      if (data.email !== undefined) {
+        this.email = data.email;
       }
-      if ((this.phone !== phone) && (phone !== '')) {
-        this.phone = phone;
+      if (data.phone !== undefined) {
+        this.phone = data.phone;
       }
   }
 
-  getBuyerInfo(): Object {
+  getBuyerInfo(): IBuyer {
     return {
       payment: this.payment,
       address: this.address,
@@ -37,26 +39,20 @@ export class Buyer{
     this.phone = '';
   }
 
-  validateBuyerInfo({payment, address, email, phone}: IBuyer): Object {
-    let validatedInfo: {[key: string]: any }= {};
-    let emailValidator = new RegExp('/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/');
-    let phoneValidator = new RegExp('/\+7\d{10}/');
+  validateBuyerInfo(): Partial<Record<keyof IBuyer, string>> {
+    const validatedInfo: Record<string, string>= {};
 
-    if (payment === ''){
+    if (this.payment === ''){
       validatedInfo.payment = 'Не выбран вид оплаты';
     }
-    if (address === ''){
+    if (this.address === ''){
       validatedInfo.address = 'Не выбран адрес доставки';
     }
-    if (email === '') {
+    if (this.email === '') {
       validatedInfo.email = 'Укажите емэил'
-    } else if (!emailValidator.test(String(email).toLocaleLowerCase())) {
-      validatedInfo.email = 'емэил введен некорректно'
     }
-    if (phone === '') {
+    if (this.phone === '') {
       validatedInfo.phone = 'Укажите телефон'
-    } else if (!phoneValidator.test(String(phone))) {
-      validatedInfo.phone = 'Телефон введен некорректно'
     }
     return validatedInfo;
   };
