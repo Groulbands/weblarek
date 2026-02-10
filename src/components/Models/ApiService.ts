@@ -11,7 +11,7 @@ export class ApiService extends Api {
     return response.items;
   }
 
-  async sendOrder(e: IOrderRequest): Promise<IOrderResponse> {
-    return await this.post<IOrderResponse>(`/order/`, e);
+  async sendOrder(order: IOrderRequest): Promise<IOrderResponse> {
+    return await this.post<IOrderResponse>(`/order/`, order);
   }
 }

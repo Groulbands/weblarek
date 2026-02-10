@@ -21,7 +21,7 @@ cartModel.addProduct(apiProducts.items[2]);
 console.log('Массив товаров из корзины: ', cartModel.getProducts());
 console.log('Общая сумма товаров в корзине: ', cartModel.getTotalPrice());
 console.log('Общее количество товаров в корзине: ', cartModel.getTotalCount());
-console.log('Есть ли товар в корзине: ', cartModel.findProduct(apiProducts.items[3]));
+console.log('Есть ли товар в корзине: ', cartModel.findProduct(apiProducts.items[3].id));
 cartModel.deleteProduct(apiProducts.items[3]);
 console.log('Массив товаров из корзины после удаления одного из них: ', cartModel.getProducts());
 cartModel.clearCart();
@@ -33,6 +33,14 @@ console.log('Данные о покупателе: ', buyerModel.getBuyerInfo())
 console.log('Валидация данных покупателя', buyerModel.validateBuyerInfo())
 buyerModel.clearBuyerInfo();
 console.log('Данные о покупателе после очистки: ', buyerModel.getBuyerInfo());
+buyerModel.setBuyerInfo({
+  payment:`cash`,
+  address:`Pushkina st.`,
+  email:`ivanov@example.com`,
+  phone:`+71234567890`
+})
+console.log('Данные о покупателе: ', buyerModel.getBuyerInfo());
+console.log('Валидация данных покупателя', buyerModel.validateBuyerInfo())
 
 
 const apiService = new ApiService(API_URL);

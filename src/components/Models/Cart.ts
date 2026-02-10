@@ -35,7 +35,7 @@ export class Cart {
     return this.items.length
   }
 
-  findProduct(item: IProduct): boolean {
-    return this.items.some(product => product.id === item.id)
+  findProduct(id: string): boolean {
+    return this.items.some(product => product.id === id)
   }
 }

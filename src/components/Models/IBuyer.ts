@@ -40,7 +40,7 @@ export class Buyer{
   }
 
   validateBuyerInfo(): Partial<Record<keyof IBuyer, string>> {
-    const validatedInfo: Record<string, string>= {};
+    const validatedInfo: Partial<Record<keyof IBuyer, string>>= {};
 
     if (this.payment === ''){
       validatedInfo.payment = 'Не выбран вид оплаты';
