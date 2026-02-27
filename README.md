@@ -166,3 +166,101 @@ IBuyer {
 
 Класс ApiService
 ApiService - Этот класс будет использовать композицию, чтобы выполнить запрос на сервер с помощью метода get класса Api и будет получать с сервера объект с массивом товаров. Также будет отправлять на сервер с помощью метода post класса Api данные о покупателе и выбранных товарах.
+
+###### Список модальных окон:
+Описание товара
+Корзина - карточка товара в корзине
+Форма оплаты
+Форма email + телефон
+Подтверждение покупки
+Модальное окно
+
+
+шапка - Корзина с счетчиком, лого
+
+Маин- список карточек
+
+переиспользуемы сущности:
+Карточка товаров
+Форма
+
+
+
+\\ Компонент header:
+Data: counter:number
+
+
+basketButton : HTMLButtonElement
+counterElement: HTMLElement
+
+set counter (value: number)
+
+\\ Компонет gallery
+Data: catalog:HTMLElement[]
+
+
+catalogElement: HTMLElement
+
+set catalog(items:HTMLElement[])
+
+\\ Компонент modal
+Data: content:HTMLElement[]
+
+
+closeButton: HTMLButtonElement
+contentElement: HTMLElement[]
+
+set content(items:HTMLElement[])
+
+
+\\ Компонент successedOrder
+Data: cost:number
+
+
+orderSuccessButton: HTMLButtonElement
+orderSuccessDesc: HTMLElement
+
+set cost(value:number) // replace?
+
+
+\\ Компонент cardCatalog
+Data: -
+
+buttonCardCatalog: HTMLButtonElement
+
+
+\\ Компонент card-preview
+Data: -
+
+addToCartButton: HTMLButtonElement
+
+
+\\ Компонент card-basket 
+Data: -
+
+deleteFromCartButton: HTMLButtonElement
+
+
+\\ Компонент basket
+Data: items: HTMLElement[]
+
+orderButton: HTMLButtonElement
+
+
+\\ Компонент orderForm
+Data: -
+
+paymentOnlineButton: HTMLButtonElement
+paymentOfflineButton: HTMLButtonElement
+addressInputElement: HTMLInputElement
+orderButtonNext: HTMLButtonElement
+formErrors: HTMLElement
+
+
+\\ Компонент contactsForm
+Data: -
+
+emailInputElement: HTMLInputElement
+phoneInputElement: HTMLInputElement
+orderButtonPay: HTMLButtonElement
+formErrors: HTMLElement
