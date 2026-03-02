@@ -8,12 +8,12 @@ export class CardCatalog extends Card {
 
   constructor (events: IEvents) {
     super(events, `#card-catalog`);
-
-    if (this.currentProduct) {
       this.container.addEventListener(`click`, () => {
-      this.events.emit(`product:select`)
-    })
-    }
+        if (this.currentProduct !== null) {
+          this.events.emit(`product:select`, this.currentProduct)
+        }
+      })
+
   }
 
   render(product: IProduct): HTMLElement {

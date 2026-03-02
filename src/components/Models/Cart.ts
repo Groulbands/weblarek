@@ -12,7 +12,6 @@ export class Cart {
 
   addProduct(item: IProduct): void {
     this.items.push(item);
-    this.events.emit(`product:addToBasket`)
   }
 
   deleteProduct(item: IProduct): void {

@@ -12,11 +12,13 @@ export class CardPreview extends Card{
 
   constructor (protected events: IEvents) {
     super(events, `#card-preview`);
-    this.cardDescription = ensureElement<HTMLElement>(`.card__text`);
+    this.cardDescription = ensureElement<HTMLElement>(`.card__text`, this.container);
     this.addToCartButton = ensureElement<HTMLButtonElement>(`.card__button`, this.container);
 
     this.addToCartButton.addEventListener(`click`, () => {
-      this.events.emit(`product:addToBasket`)
+      if (this.currentProduct !== null) {
+          this.events.emit(`product:addToBasket`, this.currentProduct)
+        }
     })
   }
 

@@ -67,10 +67,15 @@ events.on(`catalog:changed`, () => {
 })
 
 events.on(`basket:open`, () => {
-  modalWindow.open(basket.render());
+  let items = cartModel.getProducts().map((product, index) => {
+    let card = new CardBasket(events);
+    return card.render({...product, index: index+=1});
+  });
+  modalWindow.open(basket.render({items: items}));
 })
 
 events.on(`basket:clear`, () => {
+  cartModel.clearCart();
   basket.render();
 })
 
@@ -83,23 +88,20 @@ events.on(`modalWindow:close`, () => {
 })
 
 events.on(`orderButton:next`, () => {
-  if ()
 })
 
 events.on(`orderSuccess:close`, () => {
   modalWindow.close();
 })
 
-events.on(`product:select`, () => {
-  let product = productsModel.getItem();
+events.on(`product:select`, (product: IProduct) => {
+  productsModel.setItem(product);
   let card = new CardPreview(events);
-  modalWindow.open(card.render(product);
+  modalWindow.open(card.render(product))
 })
 
-events.on(`product:addToBasket`, () => {
-  let card = new CardPreview (events)
-  card.render(productsModel.getItem())
-  basket.render()
+events.on(`product:addToBasket`, (product: IProduct) => {
+  cartModel.addProduct(product);
 })
 
 events.on(`product:deleteFromBasket`, () => {
@@ -112,10 +114,24 @@ events.on(`paymentButton:card`, () => {
 events.on(`paymentButton:cash`, () => {
 })
 
-/*  `orderSuccess:close`,
+/*  
+ `catalog:changed`,
+  `basket:open`,
+  `basket:clear`,
+  `basket:confirm`,
+  `modalWindow:close`,
+  `orderButton:next`,
+  `orderSuccess:close`,
   `product:select`,
   `product:addToBasket`,
   `product:deleteFromBasket`,
   `paymentButton:card`,
   `paymentButton:cash`,
+  `input:input`,
+  `formErrors:true`,
+  `formErrors:false`,
+  `buyerInfo:update`,
+  `buyerInfo:clear`,
+  `data:received`
+]
 */
