@@ -2,7 +2,7 @@ import { IProduct, IOrderRequest, IOrderResponse } from "../../types";
 import { Api } from "../base/Api";
 
 export class ApiService extends Api {
-  constructor(baseUrl: string, options: RequestInit = {}) {
+  constructor( baseUrl: string, options: RequestInit = {}) {
     super(baseUrl, options);
   }
 

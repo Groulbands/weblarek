@@ -120,7 +120,7 @@ interface IBuyer {
   phone: string
 }
 
-###### Модели данных
+##### Модели данных
 
 Products - Класс, отвечающий за каталог на главной странице. Позволяет: получить текущий список товаров, сохранить текущий список товаров, сохранить и получить активную карточку, выбранную пользователем.
 
@@ -162,12 +162,12 @@ IBuyer {
   Сохранение данных
 }
 
-###### Слой коммуникации
+##### Слой коммуникации
 
 Класс ApiService
 ApiService - Этот класс будет использовать композицию, чтобы выполнить запрос на сервер с помощью метода get класса Api и будет получать с сервера объект с массивом товаров. Также будет отправлять на сервер с помощью метода post класса Api данные о покупателе и выбранных товарах.
 
-###### Список модальных окон:
+##### Список модальных окон:
 Описание товара
 Корзина - карточка товара в корзине
 Форма оплаты
@@ -213,7 +213,7 @@ contentElement: HTMLElement[]
 set content(items:HTMLElement[])
 
 
-\\ Компонент successedOrder
+\\ Компонент OrderSuccess
 Data: cost:number
 
 
@@ -245,7 +245,9 @@ deleteFromCartButton: HTMLButtonElement
 Data: items: HTMLElement[]
 
 orderButton: HTMLButtonElement
+basketPrice: HTMLElement;
 
+set price
 
 \\ Компонент orderForm
 Data: -
@@ -264,3 +266,33 @@ emailInputElement: HTMLInputElement
 phoneInputElement: HTMLInputElement
 orderButtonPay: HTMLButtonElement
 formErrors: HTMLElement
+
+
+
+
+##### Event-list
+`basket:open`,
+  `catalog:changed`,
+  `modalWindow:close`,
+  `orderSuccess:close`,
+  `product:select`,
+  `product:addToBasket`,
+  `product:deleteFromBasket`,
+  `basket:clear`,
+  `basket:confirm`,
+  `orderButton:next`,
+  `paymentButton:card`,
+  `paymentButton:cash`,
+  `input:input`,
+  `formErrors:true`,
+  `formErrors:false`,
+  `buyerInfo:update`,
+  `buyerInfo:clear`,
+  `data:received`
+
+
+
+
+
+##### Presenter
+

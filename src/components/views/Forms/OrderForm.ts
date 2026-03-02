@@ -1,0 +1,32 @@
+import { Form } from "./Form";
+import { IEvents } from "../../base/Events"
+import { ensureElement } from "../../../utils/utils"
+
+export class OrderForm extends Form {
+  protected paymentOnlineButton: HTMLButtonElement;
+  protected paymentOfflineButton: HTMLButtonElement;
+  protected addressInputElement: HTMLInputElement;
+
+  constructor (protected events: IEvents, container: HTMLElement) {
+    super(events, container);
+    this.paymentOnlineButton = ensureElement<HTMLButtonElement>(`[name="card"]`, this.container);
+    this.paymentOfflineButton = ensureElement<HTMLButtonElement>(`[name="cash"]`, this.container);
+    this.addressInputElement = ensureElement<HTMLInputElement>(`[name="address"]`, this.container);
+
+    this.paymentOnlineButton.classList.add(`button_alt-active`);
+
+    this.paymentOnlineButton.addEventListener(`click`, () => {
+      this.events.emit(`paymentButton:card`)
+      this.paymentOfflineButton.classList.remove(`button_alt-active`);
+      this.paymentOnlineButton.classList.add(`button_alt-active`);
+    })
+    this.paymentOfflineButton.addEventListener(`click`, () => {
+      this.events.emit(`paymentButton:cash`)
+      this.paymentOnlineButton.classList.remove(`button_alt-active`);
+      this.paymentOfflineButton.classList.add(`button_alt-active`);
+    })
+    this.addressInputElement.addEventListener(`input`, () => {
+      this.events.emit(`input:input`)
+    })
+  }
+}

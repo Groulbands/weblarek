@@ -1,52 +1,87 @@
-//import './scss/styles.scss';
+import './scss/styles.scss';
 
 import { Cart } from './components/Models/Cart';
 import { Products } from './components/Models/Catalog';
-import { Buyer } from './components/Models/IBuyer';
+import { Buyer } from './components/Models/Buyer';
+import { IEvents, EventEmitter } from './components/base/Events';
+
+import { CardBasket } from './components/views/Cards/CardBasket'; 
+import { CardCatalog } from './components/views/Cards/CardCatalog'; 
+import { CardPreview } from './components/views/Cards/CardPreview'; 
+import { ContactsForm } from './components/views/Forms/ContactForm'; 
+import { OrderForm } from './components/views/Forms/OrderForm'; 
+import { Basket } from './components/views/Basket'; 
+import { Gallery } from './components/views/Gallery'; 
+import { Header } from './components/views/Header'; 
+import { ModalWindow } from './components/views/ModalWindow'; 
+import { OrderSuccess } from './components/views/SuccessedOrder'; 
 
 import { apiProducts } from './utils/data';
 import { ApiService } from './components/Models/ApiService';
 import { API_URL } from './utils/constants';
+import { ensureElement, cloneTemplate } from './utils/utils';
+import { IProduct } from './types';
 
-const productsModel = new Products();
-productsModel.setItems(apiProducts.items); 
-console.log(`Массив товаров из каталога: `, productsModel.getItems()) 
-productsModel.setItem(apiProducts.items[2])
-console.log(`Выбранный товар для подробного отображения: `, productsModel.getItem())
-console.log(`Товар, найденный по id: `, productsModel.getItemById(`c101ab44-ed99-4a54-990d-47aa2bb4e7d9`)) 
-
-const cartModel = new Cart();
-cartModel.addProduct(apiProducts.items[3]);
-cartModel.addProduct(apiProducts.items[2]);
-console.log('Массив товаров из корзины: ', cartModel.getProducts());
-console.log('Общая сумма товаров в корзине: ', cartModel.getTotalPrice());
-console.log('Общее количество товаров в корзине: ', cartModel.getTotalCount());
-console.log('Есть ли товар в корзине: ', cartModel.findProduct(apiProducts.items[3].id));
-cartModel.deleteProduct(apiProducts.items[3]);
-console.log('Массив товаров из корзины после удаления одного из них: ', cartModel.getProducts());
-cartModel.clearCart();
-console.log('Массив товаров из корзины после ее очистки: ', cartModel.getProducts());
-
-const buyerModel = new Buyer();
-buyerModel.setBuyerInfo({payment:`cash`})
-console.log('Данные о покупателе: ', buyerModel.getBuyerInfo());
-console.log('Валидация данных покупателя', buyerModel.validateBuyerInfo())
-buyerModel.clearBuyerInfo();
-console.log('Данные о покупателе после очистки: ', buyerModel.getBuyerInfo());
-buyerModel.setBuyerInfo({
-  payment:`cash`,
-  address:`Pushkina st.`,
-  email:`ivanov@example.com`,
-  phone:`+71234567890`
-})
-console.log('Данные о покупателе: ', buyerModel.getBuyerInfo());
-console.log('Валидация данных покупателя', buyerModel.validateBuyerInfo())
-
-
+// Модели данных
+const events = new EventEmitter();
+const productsModel = new Products(events);
+const cartModel = new Cart(events);
+const buyerModel = new Buyer(events);
 const apiService = new ApiService(API_URL);
+
+// Элементы и темплейты
+const headerElement = ensureElement<HTMLElement>(`.header`);
+const galleryElement = ensureElement<HTMLElement>(`.gallery`);
+const modalWindowElement = ensureElement<HTMLElement>(`.modal`);
+const orderSuccessTemplate = ensureElement<HTMLTemplateElement>(`#success`);
+const cardCatalogTemplate = ensureElement<HTMLTemplateElement>(`#card-catalog`);
+const cardPreviewTemplate = ensureElement<HTMLTemplateElement>(`#card-preview`);
+const cardBasketTemplate = ensureElement<HTMLTemplateElement>(`#card-basket`);
+const basketTemplate= ensureElement<HTMLTemplateElement>(`#basket`);
+const orderFormTemplate = ensureElement<HTMLTemplateElement>(`#order`);
+const contactsFormTemplate = ensureElement<HTMLTemplateElement>(`#contacts`);
+
+// Классы представления
+
+const header = new Header(events, headerElement);
+const gallery = new Gallery(galleryElement);
+const modalWindow = new ModalWindow(events, modalWindowElement);
+const orderSuccess = new OrderSuccess(events, cloneTemplate(orderSuccessTemplate));
+const basket = new Basket(events, cloneTemplate(basketTemplate));
+const orderForm = new OrderForm(events, cloneTemplate(orderFormTemplate));
+const contactsForm = new ContactsForm(events, cloneTemplate(contactsFormTemplate));
 
 apiService.fetchProducts().then(products => {
   productsModel.setItems(products)
   console.log(`Массив товаров из каталога сервера: `, productsModel.getItems()) 
 })
 .catch(error => console.log(`Ошибка:`, error)) 
+
+events.on(`catalog:changed`, () => {
+  let products = productsModel.getItems();
+  let cardArray = products.map(product => {
+    let card = new CardCatalog(events);
+    return card.render(product);
+  })
+  gallery.render({catalog: cardArray})
+})
+
+events.on(`basket:open`, () => {
+  modalWindow.open(basket.render());
+})
+
+events.on(`basket:clear`, () => {
+  basket.render();
+})
+
+events.on(`basket:confirm`, () => {
+  modalWindow.close();
+  modalWindow.open(orderForm.render());
+})
+
+events.on(`modalWindow:close`, () => {
+})
+
+events.on(`orderButton:next`, () => {
+  if ()
+})

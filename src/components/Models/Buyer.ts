@@ -1,4 +1,5 @@
 import { IBuyer, TPayment } from "../../types";
+import { IEvents } from "../base/Events";
 
 export class Buyer{
   private payment: TPayment = '';
@@ -6,19 +7,23 @@ export class Buyer{
   private email: string = '';
   private phone: string = '';
 
-  constructor() {}
+  constructor(protected events: IEvents) {}
   
   setBuyerInfo(data: Partial<IBuyer>) : void {
       if (data.payment !== undefined) {
+        this.events.emit(`buyerInfo:update`);
         this.payment = data.payment;
       }
       if (data.address !== undefined) {
+        this.events.emit(`buyerInfo:update`);
         this.address = data.address;
       }
       if (data.email !== undefined) {
+        this.events.emit(`buyerInfo:update`);
         this.email = data.email;
       }
       if (data.phone !== undefined) {
+        this.events.emit(`buyerInfo:update`);
         this.phone = data.phone;
       }
   }
@@ -33,6 +38,7 @@ export class Buyer{
   }
 
   clearBuyerInfo(): void {
+    this.events.emit(`buyerInfo:clear`)
     this.payment = '';
     this.address = '';
     this.email = '';
@@ -54,6 +60,9 @@ export class Buyer{
     if (this.phone === '') {
       validatedInfo.phone = 'Укажите телефон'
     }
+
+    this.events.emit(`buyerInfo:validated`);
+
     return validatedInfo;
   };
 

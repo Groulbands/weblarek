@@ -1,11 +1,20 @@
 let event: string[] =  [
-  `basket:open`,
   `catalog:changed`,
-  `modalWindow:close`,
-  `orderSuccess:close`,
-  `cardCatalog:open`,
-  `card:addToBasket`,
-  `card:deletoFromBasket`,
+  `basket:open`,
+  `basket:clear`,
   `basket:confirm`,
-  
+  `modalWindow:close`,
+  `orderButton:next`,
+  `orderSuccess:close`,
+  `product:select`,
+  `product:addToBasket`,
+  `product:deleteFromBasket`,
+  `paymentButton:card`,
+  `paymentButton:cash`,
+  `input:input`,
+  `formErrors:true`,
+  `formErrors:false`,
+  `buyerInfo:update`,
+  `buyerInfo:clear`,
+  `data:received`
 ]
