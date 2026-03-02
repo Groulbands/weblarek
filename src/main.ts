@@ -85,3 +85,37 @@ events.on(`modalWindow:close`, () => {
 events.on(`orderButton:next`, () => {
   if ()
 })
+
+events.on(`orderSuccess:close`, () => {
+  modalWindow.close();
+})
+
+events.on(`product:select`, () => {
+  let product = productsModel.getItem();
+  let card = new CardPreview(events);
+  modalWindow.open(card.render(product);
+})
+
+events.on(`product:addToBasket`, () => {
+  let card = new CardPreview (events)
+  card.render(productsModel.getItem())
+  basket.render()
+})
+
+events.on(`product:deleteFromBasket`, () => {
+  
+})
+
+events.on(`paymentButton:card`, () => {
+})
+
+events.on(`paymentButton:cash`, () => {
+})
+
+/*  `orderSuccess:close`,
+  `product:select`,
+  `product:addToBasket`,
+  `product:deleteFromBasket`,
+  `paymentButton:card`,
+  `paymentButton:cash`,
+*/
