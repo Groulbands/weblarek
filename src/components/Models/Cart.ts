@@ -16,7 +16,6 @@ export class Cart {
 
   deleteProduct(item: IProduct): void {
     this.items = this.items.filter(product => product !== item);
-    this.events.emit(`product:deleteFromBasket`)
   }
 
   clearCart(): void {

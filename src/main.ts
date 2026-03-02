@@ -102,10 +102,15 @@ events.on(`product:select`, (product: IProduct) => {
 
 events.on(`product:addToBasket`, (product: IProduct) => {
   cartModel.addProduct(product);
+  header.render({counter: cartModel.getTotalCount()})
 })
 
-events.on(`product:deleteFromBasket`, () => {
-  
+events.on(`product:deleteFromBasket`, (product: IProduct) => {
+  console.log(cartModel.getProducts())
+  cartModel.deleteProduct(product);
+  console.log(cartModel.getProducts())
+  basket.render();
+  header.render({counter: cartModel.getTotalCount()});
 })
 
 events.on(`paymentButton:card`, () => {
