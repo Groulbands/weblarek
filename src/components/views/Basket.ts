@@ -29,15 +29,16 @@ export class Basket extends Component<IBasket> {
 
   set items(products: HTMLElement[] | undefined | null) {
     if (!products || products.length === 0) {
+      this.basketListElement.replaceChildren();
       this.basketListElement.classList.add(`basket__list-disabled`);
-      this.orderButton.setAttribute(`disable`, `true`);
+      this.orderButton.setAttribute(`disabled`, `true`);
     } else {
       this.basketListElement.replaceChildren(...products);
       this.basketListElement.classList.remove(`basket__list-disabled`);
-      this.orderButton.setAttribute(`disable`, `false`);
+      this.orderButton.removeAttribute(`disabled`);
     }
   }
-  set price(total: number) {
+  set total(total: number) {
     this.basketPrice.textContent = `${total} синапсов`
   }
 }

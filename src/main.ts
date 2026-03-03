@@ -20,7 +20,7 @@ import { apiProducts } from './utils/data';
 import { ApiService } from './components/Models/ApiService';
 import { API_URL } from './utils/constants';
 import { ensureElement, cloneTemplate } from './utils/utils';
-import { IProduct } from './types';
+import { IBuyer, IProduct } from './types';
 
 // Модели данных
 const events = new EventEmitter();
@@ -50,6 +50,7 @@ const orderSuccess = new OrderSuccess(events, cloneTemplate(orderSuccessTemplate
 const basket = new Basket(events, cloneTemplate(basketTemplate));
 const orderForm = new OrderForm(events, cloneTemplate(orderFormTemplate));
 const contactsForm = new ContactsForm(events, cloneTemplate(contactsFormTemplate));
+const cardPreview = new CardPreview(events);
 
 apiService.fetchProducts().then(products => {
   productsModel.setItems(products)
@@ -71,7 +72,7 @@ events.on(`basket:open`, () => {
     let card = new CardBasket(events);
     return card.render({...product, index: index+=1});
   });
-  modalWindow.open(basket.render({items: items}));
+  modalWindow.open(basket.render({items: items, total: cartModel.getTotalPrice()}));
 })
 
 events.on(`basket:clear`, () => {
@@ -87,30 +88,30 @@ events.on(`basket:confirm`, () => {
 events.on(`modalWindow:close`, () => {
 })
 
-events.on(`orderButton:next`, () => {
-})
-
 events.on(`orderSuccess:close`, () => {
   modalWindow.close();
 })
 
 events.on(`product:select`, (product: IProduct) => {
   productsModel.setItem(product);
-  let card = new CardPreview(events);
-  modalWindow.open(card.render(product))
+  modalWindow.open(cardPreview.render(product))
 })
 
 events.on(`product:addToBasket`, (product: IProduct) => {
-  cartModel.addProduct(product);
+  cartModel.addProduct(product)
   header.render({counter: cartModel.getTotalCount()})
+  basket.render()
 })
 
 events.on(`product:deleteFromBasket`, (product: IProduct) => {
-  console.log(cartModel.getProducts())
   cartModel.deleteProduct(product);
-  console.log(cartModel.getProducts())
-  basket.render();
+  let items = cartModel.getProducts().map((product, index) => {
+    let card = new CardBasket(events);
+    return card.render({...product, index: index+=1});
+  });
+  basket.render({items: items, total: cartModel.getTotalPrice()});
   header.render({counter: cartModel.getTotalCount()});
+  cardPreview.inBasket = false;
 })
 
 events.on(`paymentButton:card`, () => {
@@ -119,6 +120,16 @@ events.on(`paymentButton:card`, () => {
 events.on(`paymentButton:cash`, () => {
 })
 
+events.on(`input:input`, (address) => {
+  buyerModel.setBuyerInfo(address)
+  if (buyerModel.validateBuyerInfo().address) {
+    orderForm.render()
+  }
+})
+
+events.on(`orderButton:next`, () => {
+  
+})
 /*  
  `catalog:changed`,
   `basket:open`,

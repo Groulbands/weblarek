@@ -21,11 +21,11 @@ export abstract class Form extends Component<HTMLElement> {
     if (errors.length > 0 && errors) {
       this.events.emit(`formErrors:true`)
       this.formErrorsElement.textContent = errors.join(', ');
-      this.orderFormButton.setAttribute(`disable`, `true`);
+      this.orderFormButton.setAttribute(`disabled`, `true`);
     } else { 
       this.events.emit(`formErrors:false`)
       this.formErrorsElement.textContent = ``
-      this.orderFormButton.setAttribute(`disable`, `false`);
+      this.orderFormButton.setAttribute(`disabled`, `false`);
     }
   }
 }

@@ -26,7 +26,7 @@ export class OrderForm extends Form {
       this.paymentOfflineButton.classList.add(`button_alt-active`);
     })
     this.addressInputElement.addEventListener(`input`, () => {
-      this.events.emit(`input:input`)
+      this.events.emit(`input:input`, {address: this.addressInputElement.value})
     })
   }
 }

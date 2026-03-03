@@ -16,7 +16,9 @@ export class CardBasket extends Card{
     this.itemIndexElement = ensureElement<HTMLElement>(`.basket__item-index`, this.container);
 
     this.deleteFromCartButton.addEventListener(`click`, () => {
-      this.events.emit(`product:deleteFromBasket`)
+      if (this.currentProduct !== null) {
+          this.events.emit(`product:deleteFromBasket`, this.currentProduct)
+        }
     })
   }
 

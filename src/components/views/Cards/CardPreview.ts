@@ -17,7 +17,15 @@ export class CardPreview extends Card{
 
     this.addToCartButton.addEventListener(`click`, () => {
       if (this.currentProduct !== null) {
-          this.events.emit(`product:addToBasket`, this.currentProduct)
+          if (this._inBasket == false) {
+            this.events.emit(`product:addToBasket`, this.currentProduct)
+            this._inBasket = true;
+            this.updateButtonText();
+          } else if (this._inBasket == true) {
+            this.events.emit(`product:deleteFromBasket`, this.currentProduct)
+            this._inBasket = false;
+            this.updateButtonText();
+          }
         }
     })
   }
@@ -27,10 +35,10 @@ export class CardPreview extends Card{
     this.currentProduct = product;
     this.cardDescription.textContent = product.description;
     if (product.price === null) {
-      this.addToCartButton.setAttribute(`disable`, `true`);
+      this.addToCartButton.setAttribute(`disabled`, `true`);
       this.addToCartButton.textContent = `Недоступно`;
     } else {
-      this.addToCartButton.setAttribute(`disable`, `false`);
+      this.addToCartButton.removeAttribute(`disabled`);
       this.updateButtonText();
     }
     return this.container;
