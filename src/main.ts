@@ -3,7 +3,7 @@ import './scss/styles.scss';
 import { Cart } from './components/Models/Cart';
 import { Products } from './components/Models/Catalog';
 import { Buyer } from './components/Models/Buyer';
-import { IEvents, EventEmitter } from './components/base/Events';
+import { EventEmitter } from './components/base/Events';
 
 import { CardBasket } from './components/views/Cards/CardBasket'; 
 import { CardCatalog } from './components/views/Cards/CardCatalog'; 
@@ -16,7 +16,6 @@ import { Header } from './components/views/Header';
 import { ModalWindow } from './components/views/ModalWindow'; 
 import { OrderSuccess } from './components/views/SuccessedOrder'; 
 
-import { apiProducts } from './utils/data';
 import { ApiService } from './components/Models/ApiService';
 import { API_URL } from './utils/constants';
 import { ensureElement, cloneTemplate } from './utils/utils';
@@ -68,86 +67,115 @@ events.on(`catalog:changed`, () => {
 })
 
 events.on(`basket:open`, () => {
-  let items = cartModel.getProducts().map((product, index) => {
-    let card = new CardBasket(events);
-    return card.render({...product, index: index+=1});
-  });
-  modalWindow.open(basket.render({items: items, total: cartModel.getTotalPrice()}));
-})
-
-events.on(`basket:clear`, () => {
-  cartModel.clearCart();
-  basket.render();
+  modalWindow.open(basket.render({
+    items: cartModel.getProducts().map((product, index) => {
+      let card = new CardBasket(events);
+      return card.render({...product, index: index+=1});
+    }),
+    total: cartModel.getTotalPrice()
+  }));
 })
 
 events.on(`basket:confirm`, () => {
   modalWindow.close();
+  orderForm.formErrors = buyerModel.validateBuyerInfo().address
   modalWindow.open(orderForm.render());
 })
 
-events.on(`modalWindow:close`, () => {
+events.on(`basket:changed`, () => {
+  basket.render({
+    items: cartModel.getProducts().map((product, index) => {
+      let card = new CardBasket(events);
+      return card.render({...product, index: index+=1});
+    }),
+    total: cartModel.getTotalPrice()
+  });
+  header.render({counter: cartModel.getTotalCount()});
+})
+
+events.on(`product:select`, (product: IProduct) => {
+  productsModel.setItem(product);
+  if (cartModel.findProduct(product.id)) {
+    cardPreview.inBasket = true;
+    modalWindow.open(cardPreview.render(product))
+  } else {
+    cardPreview.inBasket = false;
+    modalWindow.open(cardPreview.render(product))
+  }
+})
+
+events.on(`selectedProduct:changed`, (product: IProduct) => {
+  if (cartModel.findProduct(product.id)) {
+    cardPreview.inBasket = true;
+    modalWindow.open(cardPreview.render(product))
+  } else {
+    cardPreview.inBasket = false;
+    modalWindow.open(cardPreview.render(product))
+  }
+})
+
+events.on(`product:addToBasket`, (product: IProduct) => {
+  cartModel.addProduct(product)
+  cardPreview.inBasket = true;
+})
+
+events.on(`product:deleteFromBasket`, (product: IProduct) => {
+  cartModel.deleteProduct(product);
+  cardPreview.inBasket = false;
+})
+
+events.on(`paymentButton:card`, (data: Partial<IBuyer>) => {
+  buyerModel.setBuyerInfo(data);
+})
+
+events.on(`paymentButton:cash`, (data: Partial<IBuyer>) => {
+  buyerModel.setBuyerInfo(data);
+})
+
+events.on(`input:input`, (data: Partial<IBuyer>) => {
+  buyerModel.setBuyerInfo(data)
+  if (!data.address) {
+    orderForm.formErrors = `${buyerModel.validateBuyerInfo().address}`
+  } else if (data.address) {
+    orderForm.formErrors = ``;
+  }
+  if (!data.email && !data.phone) {
+    contactsForm.formErrors = `${buyerModel.validateBuyerInfo().email}, ` + `${buyerModel.validateBuyerInfo().phone?.toLowerCase()}`
+  } else if (!data.email && data.phone) {
+    contactsForm.formErrors = `${buyerModel.validateBuyerInfo().email}`
+  } else if (!data.phone && data.email) {
+    contactsForm.formErrors = `${buyerModel.validateBuyerInfo().phone}`
+  } else if (data.email && data.phone) {
+    contactsForm.formErrors = ``;
+  }
+})
+
+events.on(`orderButton:next`, (container) => {
+  contactsForm.formErrors = `${buyerModel.validateBuyerInfo().email}` + `, ${buyerModel.validateBuyerInfo().phone?.toLowerCase()}`
+  if (container == orderForm) {
+    ensureElement<HTMLFormElement>(`form[name=order]`, this).reset()
+    modalWindow.close();
+    modalWindow.open(contactsForm.render());
+  } else if (container == contactsForm) {
+    try {
+      const response = apiService.sendOrder({...buyerModel.getBuyerInfo(),  
+        total: cartModel.getTotalPrice(), 
+        items: cartModel.getProducts().map(product => {
+          return product.id;
+      })})
+      console.log(response)
+    } catch (error) {
+      console.log(error)
+    }
+    ensureElement<HTMLFormElement>(`form[name=contacts]`, this).reset()
+    modalWindow.close();
+    orderSuccess.total = cartModel.getTotalPrice();
+    modalWindow.open(orderSuccess.render());
+    cartModel.clearCart();
+    buyerModel.clearBuyerInfo();
+  }
 })
 
 events.on(`orderSuccess:close`, () => {
   modalWindow.close();
 })
-
-events.on(`product:select`, (product: IProduct) => {
-  productsModel.setItem(product);
-  modalWindow.open(cardPreview.render(product))
-})
-
-events.on(`product:addToBasket`, (product: IProduct) => {
-  cartModel.addProduct(product)
-  header.render({counter: cartModel.getTotalCount()})
-  basket.render()
-})
-
-events.on(`product:deleteFromBasket`, (product: IProduct) => {
-  cartModel.deleteProduct(product);
-  let items = cartModel.getProducts().map((product, index) => {
-    let card = new CardBasket(events);
-    return card.render({...product, index: index+=1});
-  });
-  basket.render({items: items, total: cartModel.getTotalPrice()});
-  header.render({counter: cartModel.getTotalCount()});
-  cardPreview.inBasket = false;
-})
-
-events.on(`paymentButton:card`, () => {
-})
-
-events.on(`paymentButton:cash`, () => {
-})
-
-events.on(`input:input`, (address) => {
-  buyerModel.setBuyerInfo(address)
-  if (buyerModel.validateBuyerInfo().address) {
-    orderForm.render()
-  }
-})
-
-events.on(`orderButton:next`, () => {
-  
-})
-/*  
- `catalog:changed`,
-  `basket:open`,
-  `basket:clear`,
-  `basket:confirm`,
-  `modalWindow:close`,
-  `orderButton:next`,
-  `orderSuccess:close`,
-  `product:select`,
-  `product:addToBasket`,
-  `product:deleteFromBasket`,
-  `paymentButton:card`,
-  `paymentButton:cash`,
-  `input:input`,
-  `formErrors:true`,
-  `formErrors:false`,
-  `buyerInfo:update`,
-  `buyerInfo:clear`,
-  `data:received`
-]
-*/

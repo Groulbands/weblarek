@@ -13,19 +13,19 @@ export abstract class Form extends Component<HTMLElement> {
     this.formErrorsElement = ensureElement<HTMLElement>(`.form__errors`, this.container);
 
     this.orderFormButton.addEventListener(`click`, () => {
-      this.events.emit(`orderButton:next`)
+      this.events.emit(`orderButton:next`, this)
     })
   }
 
-  set formErrors(errors: string[]) {
-    if (errors.length > 0 && errors) {
+  set formErrors(errors: string | undefined) {
+    if (errors && errors.length > 0) {
       this.events.emit(`formErrors:true`)
-      this.formErrorsElement.textContent = errors.join(', ');
+      this.formErrorsElement.textContent = errors;
       this.orderFormButton.setAttribute(`disabled`, `true`);
     } else { 
       this.events.emit(`formErrors:false`)
       this.formErrorsElement.textContent = ``
-      this.orderFormButton.setAttribute(`disabled`, `false`);
+      this.orderFormButton.removeAttribute(`disabled`);
     }
   }
 }

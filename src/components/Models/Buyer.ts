@@ -2,7 +2,7 @@ import { IBuyer, TPayment } from "../../types";
 import { IEvents } from "../base/Events";
 
 export class Buyer{
-  private payment: TPayment = '';
+  private payment: TPayment = 'card';
   private address: string = '';
   private email: string = '';
   private phone: string = '';
@@ -11,19 +11,19 @@ export class Buyer{
   
   setBuyerInfo(data: Partial<IBuyer>) : void {
       if (data.payment !== undefined) {
-        this.events.emit(`buyerInfo:update`);
+        this.events.emit(`buyerInfo:update`)
         this.payment = data.payment;
       }
       if (data.address !== undefined) {
-        this.events.emit(`buyerInfo:update`);
+        this.events.emit(`buyerInfo:update`)
         this.address = data.address;
       }
       if (data.email !== undefined) {
-        this.events.emit(`buyerInfo:update`);
+        this.events.emit(`buyerInfo:update`)
         this.email = data.email;
       }
       if (data.phone !== undefined) {
-        this.events.emit(`buyerInfo:update`);
+        this.events.emit(`buyerInfo:update`)
         this.phone = data.phone;
       }
   }

@@ -21,7 +21,7 @@ export class OrderSuccess extends Component<IOrderRequest> {
     });
   }
 
-  set cost(value: number) {
-    this.orderSuccessDesc.textContent.replace(/\d+/, `${value}`);
+  set total(total: number) {
+    this.orderSuccessDesc.textContent = `Списано ${total} синапсов`;
   }
 }

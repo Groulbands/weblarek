@@ -16,17 +16,19 @@ export class OrderForm extends Form {
     this.paymentOnlineButton.classList.add(`button_alt-active`);
 
     this.paymentOnlineButton.addEventListener(`click`, () => {
-      this.events.emit(`paymentButton:card`)
+      this.events.emit(`paymentButton:card`, {payment: `card`})
       this.paymentOfflineButton.classList.remove(`button_alt-active`);
       this.paymentOnlineButton.classList.add(`button_alt-active`);
     })
     this.paymentOfflineButton.addEventListener(`click`, () => {
-      this.events.emit(`paymentButton:cash`)
+      this.events.emit(`paymentButton:cash`, {payment: `cash`})
       this.paymentOnlineButton.classList.remove(`button_alt-active`);
       this.paymentOfflineButton.classList.add(`button_alt-active`);
     })
     this.addressInputElement.addEventListener(`input`, () => {
-      this.events.emit(`input:input`, {address: this.addressInputElement.value})
+      setTimeout(() => {
+        this.events.emit(`input:input`, {address: this.addressInputElement.value})
+      }, 3000)
     })
   }
 }

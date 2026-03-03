@@ -12,15 +12,17 @@ export class Cart {
 
   addProduct(item: IProduct): void {
     this.items.push(item);
+    this.events.emit(`basket:changed`)
   }
 
   deleteProduct(item: IProduct): void {
     this.items = this.items.filter(product => product.id !== item.id);
+    this.events.emit(`basket:changed`)
   }
 
   clearCart(): void {
     this.items = [];
-    this.events.emit(`basket:clear`)
+    this.events.emit(`basket:changed`)
   }
 
   getTotalPrice(): number | 0 {

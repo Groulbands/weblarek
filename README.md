@@ -271,24 +271,22 @@ formErrors: HTMLElement
 
 
 ##### Event-list
-`basket:open`,
+Events: [ 
   `catalog:changed`,
-  `modalWindow:close`,
-  `orderSuccess:close`,
+  `buyerInfo:update`,
+  `basket:open`,
+  `basket:confirm`,
+  `basket:changed`,
   `product:select`,
+  `selectedProduct:changed`,
   `product:addToBasket`,
   `product:deleteFromBasket`,
-  `basket:clear`,
-  `basket:confirm`,
-  `orderButton:next`,
   `paymentButton:card`,
   `paymentButton:cash`,
   `input:input`,
-  `formErrors:true`,
-  `formErrors:false`,
-  `buyerInfo:update`,
-  `buyerInfo:clear`,
-  `data:received`
+  `orderButton:next`,
+  `orderSuccess:close`,
+]
 
 
 

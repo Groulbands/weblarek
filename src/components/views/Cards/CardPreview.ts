@@ -19,12 +19,8 @@ export class CardPreview extends Card{
       if (this.currentProduct !== null) {
           if (this._inBasket == false) {
             this.events.emit(`product:addToBasket`, this.currentProduct)
-            this._inBasket = true;
-            this.updateButtonText();
           } else if (this._inBasket == true) {
             this.events.emit(`product:deleteFromBasket`, this.currentProduct)
-            this._inBasket = false;
-            this.updateButtonText();
           }
         }
     })
@@ -40,7 +36,7 @@ export class CardPreview extends Card{
     } else {
       this.addToCartButton.removeAttribute(`disabled`);
       this.updateButtonText();
-    }
+    } 
     return this.container;
   }
 

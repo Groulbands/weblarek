@@ -35,6 +35,5 @@ export class ModalWindow extends Component<HTMLElement> {
 
   close () {
     this.container.classList.remove(`modal_active`);
-    this.events.emit(`modalWindow:close`)
   }
 }
