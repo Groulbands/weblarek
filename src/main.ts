@@ -53,7 +53,6 @@ const cardPreview = new CardPreview(events);
 
 apiService.fetchProducts().then(products => {
   productsModel.setItems(products)
-  console.log(`Массив товаров из каталога сервера: `, productsModel.getItems()) 
 })
 .catch(error => console.log(`Ошибка:`, error)) 
 
@@ -77,9 +76,10 @@ events.on(`basket:open`, () => {
 })
 
 events.on(`basket:confirm`, () => {
-  modalWindow.close();
-  orderForm.formErrors = buyerModel.validateBuyerInfo().address
-  modalWindow.open(orderForm.render());
+  if (buyerModel.validateBuyerInfo().payment && buyerModel.validateBuyerInfo().address) {
+    orderForm.formErrors = `${buyerModel.validateBuyerInfo().payment}, ` + `${buyerModel.validateBuyerInfo().address?.toLowerCase()}`
+  }
+  modalWindow.content = orderForm.render();
 })
 
 events.on(`basket:changed`, () => {
@@ -134,45 +134,48 @@ events.on(`paymentButton:cash`, (data: Partial<IBuyer>) => {
 
 events.on(`input:input`, (data: Partial<IBuyer>) => {
   buyerModel.setBuyerInfo(data)
-  if (!data.address) {
-    orderForm.formErrors = `${buyerModel.validateBuyerInfo().address}`
-  } else if (data.address) {
+})
+
+events.on(`buyerInfo:update`, () => {
+  if (buyerModel.validateBuyerInfo().payment && buyerModel.validateBuyerInfo().address){
+    orderForm.formErrors = `${buyerModel.validateBuyerInfo().payment}, ` + `${buyerModel.validateBuyerInfo().address?.toLowerCase()}`
+  } else if (buyerModel.validateBuyerInfo().payment) {
+    orderForm.formErrors = `${buyerModel.validateBuyerInfo().payment}`;
+  } else if (buyerModel.validateBuyerInfo().address) {
+    orderForm.formErrors = `${buyerModel.validateBuyerInfo().address}`;
+  } else if (!buyerModel.validateBuyerInfo().address && !buyerModel.validateBuyerInfo().address) {
     orderForm.formErrors = ``;
   }
-  if (!data.email && !data.phone) {
+  if (buyerModel.validateBuyerInfo().email && buyerModel.validateBuyerInfo().phone) {
     contactsForm.formErrors = `${buyerModel.validateBuyerInfo().email}, ` + `${buyerModel.validateBuyerInfo().phone?.toLowerCase()}`
-  } else if (!data.email && data.phone) {
+  } else if (buyerModel.validateBuyerInfo().email) {
     contactsForm.formErrors = `${buyerModel.validateBuyerInfo().email}`
-  } else if (!data.phone && data.email) {
+  } else if (buyerModel.validateBuyerInfo().phone) {
     contactsForm.formErrors = `${buyerModel.validateBuyerInfo().phone}`
-  } else if (data.email && data.phone) {
+  } else if (!buyerModel.validateBuyerInfo().email && !buyerModel.validateBuyerInfo().phone) {
     contactsForm.formErrors = ``;
   }
 })
 
-events.on(`orderButton:next`, (container) => {
-  contactsForm.formErrors = `${buyerModel.validateBuyerInfo().email}` + `, ${buyerModel.validateBuyerInfo().phone?.toLowerCase()}`
+events.on(`orderButton:next`, (container: OrderForm | ContactsForm) => {
   if (container == orderForm) {
-    ensureElement<HTMLFormElement>(`form[name=order]`, this).reset()
-    modalWindow.close();
-    modalWindow.open(contactsForm.render());
+      ensureElement<HTMLFormElement>(`form[name=order]`).reset();
+      modalWindow.content = contactsForm.render();
   } else if (container == contactsForm) {
-    try {
-      const response = apiService.sendOrder({...buyerModel.getBuyerInfo(),  
-        total: cartModel.getTotalPrice(), 
-        items: cartModel.getProducts().map(product => {
-          return product.id;
-      })})
-      console.log(response)
-    } catch (error) {
-      console.log(error)
+    if (buyerModel.validateBuyerInfo().email && buyerModel.validateBuyerInfo().phone) {
+      contactsForm.formErrors = `${buyerModel.validateBuyerInfo().email}` + `, ${buyerModel.validateBuyerInfo().phone?.toLowerCase()}`;
     }
-    ensureElement<HTMLFormElement>(`form[name=contacts]`, this).reset()
-    modalWindow.close();
-    orderSuccess.total = cartModel.getTotalPrice();
-    modalWindow.open(orderSuccess.render());
-    cartModel.clearCart();
-    buyerModel.clearBuyerInfo();
+    apiService.sendOrder({...buyerModel.getBuyerInfo(),  
+      total: cartModel.getTotalPrice(), 
+      items: cartModel.getProducts().map(product => {
+      return product.id;
+    })}).then(resolve => {
+      ensureElement<HTMLFormElement>(`form[name=contacts]`).reset()
+      orderSuccess.total = resolve.total;
+      modalWindow.content = orderSuccess.render();
+      cartModel.clearCart();
+      buyerModel.clearBuyerInfo();
+    }).catch(error => contactsForm.formErrors = error)
   }
 })
 

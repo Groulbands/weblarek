@@ -13,14 +13,10 @@ export class ContactsForm extends Form {
     this.phoneInputElement = ensureElement<HTMLInputElement>(`[name="phone"]`, this.container);
 
     this.emailInputElement.addEventListener(`input`, () => {
-      setTimeout(() => {
         this.events.emit(`input:input`, {email: this.emailInputElement.value, phone: this.phoneInputElement.value})
-      }, 3000)
     })
     this.phoneInputElement.addEventListener(`input`, () => {
-      setTimeout(() => {
         this.events.emit(`input:input`, {email: this.emailInputElement.value, phone: this.phoneInputElement.value})
-      }, 3000)
     })
   }
 }

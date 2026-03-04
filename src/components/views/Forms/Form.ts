@@ -1,6 +1,6 @@
 import { Component } from "../../base/Component"
 import { IEvents } from "../../base/Events"
-import { cloneTemplate, ensureElement } from "../../../utils/utils"
+import { ensureElement } from "../../../utils/utils"
 
 export abstract class Form extends Component<HTMLElement> {
   protected orderFormButton: HTMLButtonElement;
@@ -12,7 +12,8 @@ export abstract class Form extends Component<HTMLElement> {
     this.orderFormButton = ensureElement<HTMLButtonElement>(`button[type="submit"]`, this.container);
     this.formErrorsElement = ensureElement<HTMLElement>(`.form__errors`, this.container);
 
-    this.orderFormButton.addEventListener(`click`, () => {
+    this.orderFormButton.addEventListener(`click`, (e) => {
+      e.preventDefault()
       this.events.emit(`orderButton:next`, this)
     })
   }

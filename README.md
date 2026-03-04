@@ -167,130 +167,162 @@ IBuyer {
 Класс ApiService
 ApiService - Этот класс будет использовать композицию, чтобы выполнить запрос на сервер с помощью метода get класса Api и будет получать с сервера объект с массивом товаров. Также будет отправлять на сервер с помощью метода post класса Api данные о покупателе и выбранных товарах.
 
-##### Список модальных окон:
-Описание товара
-Корзина - карточка товара в корзине
-Форма оплаты
-Форма email + телефон
-Подтверждение покупки
-Модальное окно
+#### Слой view:
 
+##### Класс Header (Наследует класс Component)
+Отвечает за состояние шапки сайта.
 
-шапка - Корзина с счетчиком, лого
+Конструктор: `constructor(protected events: IEvents, container: HTMLElement)`, принимает коллекцию событий из класса EventEmitter для их использования, также принимает `container: HTMLElement` для класса Component.
 
-Маин- список карточек
+Поля класса:
+`counterElement: HTMLElement;` - Элемент, отвечающий за счетчик элементов в корзине.
+`basketButton: HTMLButtonElement;` - Элемент, отвечающий за корзину.
 
-переиспользуемы сущности:
-Карточка товаров
-Форма
+Методы класса:
+`set counter(value: number) ` - Обновление счетчика элементов в  корзине.
 
+##### Класс Basket
+Класс отвечающий за состояние корзины.
 
+Конструктор: `constructor (protected events:IEvents, container: HTMLElement)`, принимает коллекцию событий из класса EventEmitter для их использования, также принимает `container: HTMLElement` для класса Component.
 
-\\ Компонент header:
-Data: counter:number
+Поля класса:
+`basketTitle: HTMLElement;` - Элемент, отвечающий за заголовок корзины.
+`basketListElement: HTMLUListElement;` - Элемент, отвечающий за список товаров в корзине.
+`orderButton: HTMLButtonElement;` - Кнопка, отвечающая за кнопку подтверждения в корзине.
+`basketPrice: HTMLElement;` - Элемент, отвечающий за общую суммы в корзине.
 
+Методы класса:
+`set items(products: HTMLElement[] | undefined | null)` - Обновляет содержимое корзины, и в зависимости от её наполнения изменяет состояние кнопки подтверждения(Добавляя и удаляя на кнопке аттрибут `disabled`).
 
-basketButton : HTMLButtonElement
-counterElement: HTMLElement
+`set total(total: number)` - обновляет общую сумму в корзине.
 
-set counter (value: number)
+##### Класс Gallery
 
-\\ Компонет gallery
-Data: catalog:HTMLElement[]
+Конструктор: `constructor (container: HTMLElement)` принимает `container: HTMLElement` для класса Component.
 
+Полей класса нет
 
-catalogElement: HTMLElement
+Методы класса:
+`set catalog(items: HTMLElement[])` - принимает коллекцию HTMLElement-ов для обновления содержимого каталога.
 
-set catalog(items:HTMLElement[])
+##### Класс ModalWindow
+Конструктор: `constructor (protected events:IEvents, container: HTMLElement)`, принимает коллекцию событий из класса EventEmitter для их использования, также принимает `container: HTMLElement` для класса Component.
 
-\\ Компонент modal
-Data: content:HTMLElement[]
+Поля класса:
+`modalContentElement: HTMLElement;` - Элемент, отвечающий за контент модального окна.
+`modalCloseButton: HTMLButtonElement;` - Кнопка, отвечающая за кнопку закрытия модального окна.
 
+Методы класса:
+`set content(content: HTMLElement)` - Принимает контент и изменяет содержимое модального окна.
+`open (content: HTMLElement)` - Принимает контент и открывает модальное окно с этим контентом. Для отображения модального окна используется добавление(При инициации открытия) и удаление(При инициации закрытия) в classList класса `modal_active`
+`close ()` - Закрывает модальное окно.
 
-closeButton: HTMLButtonElement
-contentElement: HTMLElement[]
+##### OrderSuccess
+Конструктор: `constructor (protected events:IEvents, container: HTMLElement)`, принимает коллекцию событий из класса EventEmitter для их использования, также принимает `container: HTMLElement` для класса Component.
 
-set content(items:HTMLElement[])
+Поля класса:
+`orderSuccessTitle: HTMLElement;` -  Элемент, отвечающий за заголовок окна успешного оформления заказа.
+`orderSuccessButton: HTMLButtonElement;` -  Кнопка, отвечающая за кнопку окна успешного оформления заказа.
+`orderSuccessDesc: HTMLElement;` -  Элемент, отвечающий за описание окна успешного оформления заказа.
 
+Методы класса:
+`set total(total: number)` - Принимает общую сумму оформленных товаров, и изменяет содержимое описания.
 
-\\ Компонент OrderSuccess
-Data: cost:number
+##### Абстрактный класс Card
+Конструктор: `constructor(protected events: IEvents, protected template: string | HTMLTemplateElement)`, принимает коллекцию событий из класса EventEmitter для их использования, также принимает `template: string | HTMLTemplateElement)` для класса Component.
 
+Поля класса:
+`title: HTMLElement;` -  Элемент, отвечающий за заголовок карточки.
+`image?: HTMLImageElement;` -  Элемент, отвечающий за изображение карточки.
+`category?: HTMLElement;` -  Элемент, отвечающий за категорию карточки.
+`price: HTMLElement;` -  Элемент, отвечающий за цену карточки.
 
-orderSuccessButton: HTMLButtonElement
-orderSuccessDesc: HTMLElement
+Методы класса:
+`renderBase(product: IProduct): void` - принимает объект типа IProduct, и обновляет данные карточки исходя из значений объекта.
 
-set cost(value:number) // replace?
+##### Класс CardBasket наследует абстрактный класс Card
+Конструктор: `constructor (protected events: IEvents)`, принимает коллекцию событий из класса EventEmitter для их использования, отправляет `super(events, '#card-basket')` для класса Card.
 
+Поля класса:
+`currentProduct: IProduct | null = null;` -  Элемент, отвечающий за текущий товар в карточке.
+`deleteFromCartButton: HTMLButtonElement;` -  Кнопка, отвечающая за кнопку удаления товара из корзины.
+`itemIndexElement: HTMLElement;` -  Элемент, отвечающий за порядковый номер товара в корзине.
 
-\\ Компонент cardCatalog
-Data: -
+Методы класса:
+`render (product: IProduct & {index : number}): HTMLElement` - принимает продукт и индекс товара и обновляет данные карточки исходя из их значений.
 
-buttonCardCatalog: HTMLButtonElement
+##### Класс CardCatalog наследует абстрактный класс Card
+Конструктор: `constructor (protected events: IEvents)`, принимает коллекцию событий из класса EventEmitter для их использования, отправляет `super(events, '#card-catalog')` для класса Card.
 
+Поля класса:
+`private currentProduct: IProduct | null = null;` - Приватный элемент, отвечающий карточку каталога.
 
-\\ Компонент card-preview
-Data: -
+Методы класса:
+`render (product: IProduct & {index : number}): HTMLElement` - принимает продукт и обновляет данные карточки исходя из его значений.
 
-addToCartButton: HTMLButtonElement
+##### Класс CardPreview наследует абстрактный класс Card
+Конструктор: `constructor (protected events: IEvents)`, принимает коллекцию событий из класса EventEmitter для их использования, отправляет `super(events, '#card-preview')` для класса Card.
 
+Поля класса:
+`currentProduct: IProduct | null = null;` - Элемент, отвечающий за текущий товар в карточке.
+`cardDescription: HTMLElement;` - Элемент, отвечающий за описание карточки.
+`addToCartButton: HTMLButtonElement;` - Кнопка, отвечающая за кнопку добавления в корзину.
+`  private _inBasket: boolean = false;` - Свойство, отвечающее за определение наличия товара в корзине.
 
-\\ Компонент card-basket 
-Data: -
+Методы класса:
+`render (product: IProduct & {index : number}): HTMLElement` - принимает продукт и индекс товара и обновляет данные карточки исходя из их значений.
+`set inBasket(value: boolean)` - принимает true|false и изменяет приватное свойство `__inBasket`. Вызывает приватный метод `private updateButtonText()`.
+`private updateButtonText()` - Обновляет текст на кнопке добавления в корзину, в зависимости от того, находится товар в корзине или нет.
 
-deleteFromCartButton: HTMLButtonElement
+##### Абстрактный класс Form
+Конструктор: `constructor (protected events:IEvents, container: HTMLElement)`, принимает коллекцию событий из класса EventEmitter для их использования, также принимает `container: HTMLElement` для класса Component.
 
+Поля класса:
+`orderFormButton: HTMLButtonElement;` - Кнопка, отвечающая за переход к следующей форме.
+`formErrorsElement: HTMLElement;` - Элемент, отвечающий за отображение ошибок на форме при неправильной валидации.
 
-\\ Компонент basket
-Data: items: HTMLElement[]
+Методы класса:
+`set formErrors(errors: string | undefined)` - Принимает ошибки, устанавливает значения ошибок в элемент отвечающий за отображение ошибок и изменяет состояние кнопки перехода к следующей форме, добавляя и удаляя на кнопке аттрибут `disabled`
 
-orderButton: HTMLButtonElement
-basketPrice: HTMLElement;
+##### Класс OrderForm наследует абстрактный класс Form
+Конструктор: `constructor (protected events:IEvents, container: HTMLElement)`, принимает коллекцию событий из класса EventEmitter для их использования, также принимает `container: HTMLElement` для класса Component.
 
-set price
+Поля класса:
+`paymentOnlineButton: HTMLButtonElement;` - Кнопка, отвечающая за выбор способа оплаты.
+`paymentOfflineButton: HTMLButtonElement;` - Кнопка, отвечающая за выбор способа оплаты.
+`addressInputElement: HTMLInputElement;` - Элемент ввода формы, отвечающий за адрес.
 
-\\ Компонент orderForm
-Data: -
+Методов класса нет.
 
-paymentOnlineButton: HTMLButtonElement
-paymentOfflineButton: HTMLButtonElement
-addressInputElement: HTMLInputElement
-orderButtonNext: HTMLButtonElement
-formErrors: HTMLElement
+##### Класс ContactsForm наследует абстрактный класс Form
+Конструктор: `constructor (protected events:IEvents, container: HTMLElement)`, принимает коллекцию событий из класса EventEmitter для их использования, также принимает `container: HTMLElement` для класса Component.
 
+Поля класса:
+`emailInputElement: HTMLInputElement;` - Элемент ввода формы, отвечающий за емэил.
+`phoneInputElement: HTMLInputElement;` - Элемент ввода формы, отвечающий за телефон.
 
-\\ Компонент contactsForm
-Data: -
+Методов класса нет.
 
-emailInputElement: HTMLInputElement
-phoneInputElement: HTMLInputElement
-orderButtonPay: HTMLButtonElement
-formErrors: HTMLElement
-
-
-
-
-##### Event-list
+#### Event-list
 Events: [ 
-  `catalog:changed`,
-  `buyerInfo:update`,
-  `basket:open`,
-  `basket:confirm`,
-  `basket:changed`,
-  `product:select`,
-  `selectedProduct:changed`,
-  `product:addToBasket`,
-  `product:deleteFromBasket`,
-  `paymentButton:card`,
-  `paymentButton:cash`,
-  `input:input`,
-  `orderButton:next`,
-  `orderSuccess:close`,
+  `catalog:changed` - состояние каталога изменено,
+  `buyerInfo:update` - обновлена информация о покупателе,
+  `basket:open` - открыта корзина,
+  `basket:confirm` - подтверждение товаров в корзине,
+  `basket:changed` - содержимое корзины изменено,
+  `product:select` - выбран продукт для детального отображения,
+  `selectedProduct:changed` - изменен продукт для детального отображения,
+  `product:addToBasket` - продукт добавлен в корзину,
+  `product:deleteFromBasket` - продукт удален из корзины,
+  `paymentButton:card` - выбор способа оплаты онлайн,
+  `paymentButton:cash` - выбор способа оплаты при получении,
+  `input:input` - ввод данных в поля форм, отвечающий за данные покупателя,
+  `orderButton:next` - подтвеждение данных и переход к следующей форме,
+  `orderSuccess:close` - закрытие окна успешного оформления заказа,
 ]
 
+#### Слой Presenter
+Реализация была выбрана в точке входа приложения(main.ts).
 
-
-
-
-##### Presenter
-
+Слой использует Модели данных, слои отображения и события, которые ими генерируются для логики приложения и успешного отображения всех частей.

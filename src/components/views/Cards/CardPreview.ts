@@ -45,7 +45,7 @@ export class CardPreview extends Card{
     this.updateButtonText()
   }
 
-  private updateButtonText () {
+  private updateButtonText() {
     if (this.addToCartButton.getAttribute(`disable`) !== `true`) {
       this.addToCartButton.textContent = this._inBasket ? `Удалить из корзины` : `Купить`;
     }

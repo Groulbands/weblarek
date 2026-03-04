@@ -30,7 +30,7 @@ export class ModalWindow extends Component<HTMLElement> {
 
   open (content: HTMLElement) {
     this.container.classList.add(`modal_active`);
-    this.modalContentElement.replaceChildren(content)
+    this.content = content;
   }
 
   close () {
