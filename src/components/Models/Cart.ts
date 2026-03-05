@@ -26,14 +26,11 @@ export class Cart {
   }
 
   getTotalPrice(): number | 0 {
-    let total = 0;
-    this.items.forEach(item => {
-      if (item.price !== null) {
-        total += item.price;
-      }
-    })
-    return total;
-  }
+    const total = this.items.reduce((sum, item) => {
+      return sum + (item.price ?? 0);
+    }, 0);
+return total
+}
 
   getTotalCount(): number {
     return this.items.length

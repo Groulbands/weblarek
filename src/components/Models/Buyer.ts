@@ -38,11 +38,11 @@ export class Buyer{
   }
 
   clearBuyerInfo(): void {
-    this.events.emit(`buyerInfo:clear`)
     this.payment = '';
     this.address = '';
     this.email = '';
     this.phone = '';
+    this.events.emit(`buyerInfo:clear`)
   }
 
   validateBuyerInfo(): Partial<Record<keyof IBuyer, string>> {

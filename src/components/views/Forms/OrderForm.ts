@@ -3,30 +3,51 @@ import { IEvents } from "../../base/Events"
 import { ensureElement } from "../../../utils/utils"
 
 export class OrderForm extends Form {
-  protected paymentOnlineButton: HTMLButtonElement;
-  protected paymentOfflineButton: HTMLButtonElement;
-  protected addressInputElement: HTMLInputElement;
+  protected _paymentOnlineButton: HTMLButtonElement;
+  protected _paymentOfflineButton: HTMLButtonElement;
+  protected _addressInputElement: HTMLInputElement;
 
   constructor (protected events: IEvents, container: HTMLElement) {
     super(events, container);
-    this.paymentOnlineButton = ensureElement<HTMLButtonElement>(`[name="card"]`, this.container);
-    this.paymentOfflineButton = ensureElement<HTMLButtonElement>(`[name="cash"]`, this.container);
-    this.addressInputElement = ensureElement<HTMLInputElement>(`[name="address"]`, this.container);
+    this._paymentOnlineButton = ensureElement<HTMLButtonElement>(`[name="card"]`, this.container);
+    this._paymentOfflineButton = ensureElement<HTMLButtonElement>(`[name="cash"]`, this.container);
+    this._addressInputElement = ensureElement<HTMLInputElement>(`[name="address"]`, this.container);
 
-    this.paymentOnlineButton.classList.add(`button_alt-active`);
+    this._paymentOnlineButton.classList.add(`button_alt-active`);
 
-    this.paymentOnlineButton.addEventListener(`click`, () => {
-      this.events.emit(`paymentButton:card`, {payment: `card`})
-      this.paymentOfflineButton.classList.remove(`button_alt-active`);
-      this.paymentOnlineButton.classList.add(`button_alt-active`);
+    this._paymentOnlineButton.addEventListener(`click`, () => {
+      this.events.emit(`paymentButton:card`)
     })
-    this.paymentOfflineButton.addEventListener(`click`, () => {
-      this.events.emit(`paymentButton:cash`, {payment: `cash`})
-      this.paymentOnlineButton.classList.remove(`button_alt-active`);
-      this.paymentOfflineButton.classList.add(`button_alt-active`);
+    this._paymentOfflineButton.addEventListener(`click`, () => {
+      this.events.emit(`paymentButton:cash`)
     })
-    this.addressInputElement.addEventListener(`input`, () => {
-        this.events.emit(`input:input`, {address: this.addressInputElement.value})
+    this._addressInputElement.addEventListener(`input`, () => {
+        this.events.emit(`input:input`, {address: this._addressInputElement.value})
     })
+  }
+
+  set payment(value: string) {
+    if (value == `card`) {
+      this.setPaymentOnlineButton;
+    } else if (value == `cash`) {
+      this.setPaymentOfflineButton;
+    } else {
+      this._paymentOfflineButton.classList.remove(`button_alt-active`);
+      this._paymentOnlineButton.classList.remove(`button_alt-active`);
+    }
+  }
+  setPaymentOnlineButton() {
+    this._paymentOfflineButton.classList.remove(`button_alt-active`);
+    this._paymentOnlineButton.classList.add(`button_alt-active`);
+  }
+
+  setPaymentOfflineButton() {{
+    this._paymentOnlineButton.classList.remove(`button_alt-active`);
+    this._paymentOfflineButton.classList.add(`button_alt-active`);
+  }
+  }
+
+  set address(value: string) {
+    this._addressInputElement.value = value;
   }
 }

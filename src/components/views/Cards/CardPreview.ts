@@ -2,41 +2,47 @@ import { Card } from "./Card";
 import { IProduct } from "../../../types";
 import { IEvents } from "../../base/Events";
 import { ensureElement } from "../../../utils/utils";
+import { categoryMap, CDN_URL } from "../../../utils/constants";
 
 
 export class CardPreview extends Card{
-  protected currentProduct: IProduct | null = null;
+  protected image: HTMLImageElement;
+  protected category: HTMLElement;
+  protected currentProduct?: IProduct;
   protected cardDescription: HTMLElement;
   protected addToCartButton: HTMLButtonElement;
   private _inBasket: boolean = false;
 
-  constructor (protected events: IEvents) {
-    super(events, `#card-preview`);
+  constructor (protected events: IEvents, container: HTMLElement) {
+    super(events, container);
+    this.image = ensureElement<HTMLImageElement>(`.card__image`, this.container);
+    this.category = ensureElement<HTMLElement>(`.card__category`, this.container);
     this.cardDescription = ensureElement<HTMLElement>(`.card__text`, this.container);
     this.addToCartButton = ensureElement<HTMLButtonElement>(`.card__button`, this.container);
 
     this.addToCartButton.addEventListener(`click`, () => {
-      if (this.currentProduct !== null) {
-          if (this._inBasket == false) {
-            this.events.emit(`product:addToBasket`, this.currentProduct)
-          } else if (this._inBasket == true) {
-            this.events.emit(`product:deleteFromBasket`, this.currentProduct)
-          }
+        if (this._inBasket == false) {
+          this.events.emit(`product:addToBasket`, this.currentProduct)
+        } else if (this._inBasket == true) {
+          this.events.emit(`product:deleteFromBasket`, this.currentProduct)
         }
     })
   }
 
   render(product: IProduct): HTMLElement {
-    this.renderBase(product);
+    this.title.textContent = product.title;
+    this.price.textContent = product.price ? `${product.price} синапсов` : `Бесценно`;
     this.currentProduct = product;
     this.cardDescription.textContent = product.description;
+    this.setImage(this.image, `${CDN_URL}${product.image}`, product.title);
+        this.category.className =`card__category ${categoryMap[product.category as keyof typeof categoryMap]}`;
+        this.category.textContent = product.category;
     if (product.price === null) {
       this.addToCartButton.setAttribute(`disabled`, `true`);
       this.addToCartButton.textContent = `Недоступно`;
     } else {
       this.addToCartButton.removeAttribute(`disabled`);
-      this.updateButtonText();
-    } 
+    }
     return this.container;
   }
 
@@ -46,8 +52,6 @@ export class CardPreview extends Card{
   }
 
   private updateButtonText() {
-    if (this.addToCartButton.getAttribute(`disable`) !== `true`) {
-      this.addToCartButton.textContent = this._inBasket ? `Удалить из корзины` : `Купить`;
-    }
+    this.addToCartButton.textContent = this._inBasket ? `Удалить из корзины` : `Купить`;
   }
 }

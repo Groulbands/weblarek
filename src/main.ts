@@ -49,7 +49,7 @@ const orderSuccess = new OrderSuccess(events, cloneTemplate(orderSuccessTemplate
 const basket = new Basket(events, cloneTemplate(basketTemplate));
 const orderForm = new OrderForm(events, cloneTemplate(orderFormTemplate));
 const contactsForm = new ContactsForm(events, cloneTemplate(contactsFormTemplate));
-const cardPreview = new CardPreview(events);
+const cardPreview = new CardPreview(events, cloneTemplate(cardPreviewTemplate));
 
 apiService.fetchProducts().then(products => {
   productsModel.setItems(products)
@@ -57,79 +57,70 @@ apiService.fetchProducts().then(products => {
 .catch(error => console.log(`Ошибка:`, error)) 
 
 events.on(`catalog:changed`, () => {
-  let products = productsModel.getItems();
-  let cardArray = products.map(product => {
-    let card = new CardCatalog(events);
-    return card.render(product);
-  })
-  gallery.render({catalog: cardArray})
+  gallery.render({catalog: productsModel.getItems().map(product => {
+    const card = new CardCatalog(events, cardCatalogTemplate);
+    return card.render(product)
+  })})
 })
 
 events.on(`basket:open`, () => {
-  modalWindow.open(basket.render({
-    items: cartModel.getProducts().map((product, index) => {
-      let card = new CardBasket(events);
-      return card.render({...product, index: index+=1});
-    }),
-    total: cartModel.getTotalPrice()
-  }));
+  modalWindow.open(basket.render())
 })
 
 events.on(`basket:confirm`, () => {
   if (buyerModel.validateBuyerInfo().payment && buyerModel.validateBuyerInfo().address) {
     orderForm.formErrors = `${buyerModel.validateBuyerInfo().payment}, ` + `${buyerModel.validateBuyerInfo().address?.toLowerCase()}`
   }
+  orderForm.payment = buyerModel.getBuyerInfo().payment;
   modalWindow.content = orderForm.render();
 })
 
 events.on(`basket:changed`, () => {
-  basket.render({
-    items: cartModel.getProducts().map((product, index) => {
-      let card = new CardBasket(events);
-      return card.render({...product, index: index+=1});
-    }),
-    total: cartModel.getTotalPrice()
-  });
+  basket.render({ 
+    items: cartModel.getProducts().map((product, index) => { 
+      const card = new CardBasket(events, cardBasketTemplate); 
+      return card.render({...product, index: index+=1}); 
+    }), 
+    total: cartModel.getTotalPrice() 
+  }); 
   header.render({counter: cartModel.getTotalCount()});
 })
 
 events.on(`product:select`, (product: IProduct) => {
   productsModel.setItem(product);
-  if (cartModel.findProduct(product.id)) {
-    cardPreview.inBasket = true;
-    modalWindow.open(cardPreview.render(product))
-  } else {
-    cardPreview.inBasket = false;
-    modalWindow.open(cardPreview.render(product))
-  }
 })
 
-events.on(`selectedProduct:changed`, (product: IProduct) => {
-  if (cartModel.findProduct(product.id)) {
-    cardPreview.inBasket = true;
-    modalWindow.open(cardPreview.render(product))
-  } else {
-    cardPreview.inBasket = false;
-    modalWindow.open(cardPreview.render(product))
+events.on(`selectedProduct:changed`, () => {
+  const product = productsModel.getItem();
+  if (product) {
+    if (cartModel.findProduct(product.id)){
+      cardPreview.inBasket = true; 
+      modalWindow.open(cardPreview.render(product))
+    } else {
+      cardPreview.inBasket = false; 
+      modalWindow.open(cardPreview.render(product))
+    }
   }
 })
 
 events.on(`product:addToBasket`, (product: IProduct) => {
   cartModel.addProduct(product)
-  cardPreview.inBasket = true;
+  modalWindow.close()
 })
 
 events.on(`product:deleteFromBasket`, (product: IProduct) => {
   cartModel.deleteProduct(product);
-  cardPreview.inBasket = false;
+  modalWindow.close()
 })
 
-events.on(`paymentButton:card`, (data: Partial<IBuyer>) => {
-  buyerModel.setBuyerInfo(data);
+events.on(`paymentButton:card`, () => {
+  buyerModel.setBuyerInfo({payment: `card`});
+  orderForm.setPaymentOnlineButton();
 })
 
-events.on(`paymentButton:cash`, (data: Partial<IBuyer>) => {
-  buyerModel.setBuyerInfo(data);
+events.on(`paymentButton:cash`, () => {
+  buyerModel.setBuyerInfo({payment: `cash`});
+  orderForm.setPaymentOfflineButton();
 })
 
 events.on(`input:input`, (data: Partial<IBuyer>) => {
@@ -159,7 +150,6 @@ events.on(`buyerInfo:update`, () => {
 
 events.on(`orderButton:next`, (container: OrderForm | ContactsForm) => {
   if (container == orderForm) {
-      ensureElement<HTMLFormElement>(`form[name=order]`).reset();
       modalWindow.content = contactsForm.render();
   } else if (container == contactsForm) {
     if (buyerModel.validateBuyerInfo().email && buyerModel.validateBuyerInfo().phone) {
@@ -170,11 +160,14 @@ events.on(`orderButton:next`, (container: OrderForm | ContactsForm) => {
       items: cartModel.getProducts().map(product => {
       return product.id;
     })}).then(resolve => {
-      ensureElement<HTMLFormElement>(`form[name=contacts]`).reset()
       orderSuccess.total = resolve.total;
       modalWindow.content = orderSuccess.render();
       cartModel.clearCart();
       buyerModel.clearBuyerInfo();
+      orderForm.payment = buyerModel.getBuyerInfo().payment;
+      orderForm.address = buyerModel.getBuyerInfo().address;
+      contactsForm.email = buyerModel.getBuyerInfo().email;
+      contactsForm.phone = buyerModel.getBuyerInfo().phone;
     }).catch(error => contactsForm.formErrors = error)
   }
 })

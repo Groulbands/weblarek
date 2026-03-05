@@ -3,7 +3,7 @@ import { IEvents } from "../base/Events";
 
 export class Products {
   private items: IProduct[] = [];
-  private selectedProduct: IProduct | null = null;
+  private selectedProduct?: IProduct;
 
   constructor(protected events: IEvents) {}
 
@@ -25,7 +25,7 @@ export class Products {
     this.events.emit(`selectedProduct:changed`, this.selectedProduct)
   }
   
-  getItem(): IProduct | null{
+  getItem(): IProduct | undefined{
     return this.selectedProduct;
   }
 }   
