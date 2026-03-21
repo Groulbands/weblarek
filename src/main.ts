@@ -27,7 +27,7 @@ const productsModel = new Products(events);
 const cartModel = new Cart(events);
 const buyerModel = new Buyer(events);
 const apiService = new ApiService(API_URL);
-console.log(import.meta.env);
+
 // Элементы и темплейты
 const headerElement = ensureElement<HTMLElement>(`.header`);
 const galleryElement = ensureElement<HTMLElement>(`.gallery`);
